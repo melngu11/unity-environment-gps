@@ -10,8 +10,8 @@ using namespace std;
 const int ROW = 20;
 const int COL = 20;
 
-
-int grid[ROW][COL];
+//Create matrix
+char grid[ROW][COL];
 int distance[ROW][COL];
 bool visisted[ROW][COL];
 pair<int,int> parent[ROW][COL];
@@ -35,7 +35,20 @@ void dijstra(pair<int,int> start, pair<int,int>goal){
 int main(){
     for (int i = 0; i <20; i++){
         for (int j = 0 ; j < 20; j++){
-            grid[i][j] = 0;
+            grid[i][j] = ' ';
         }
     }
+
+    // Add obstacles
+    grid[5][5] = '#';
+    grid[5][6] = '#'
+    grid[5][7] = '#'
+    grid[10][12] ='#';
+    grid[9][12] ='#';
+    grid[8][12] = '#';
+    grid[7][12] = '#';
+
+    //Initialize start and goal coordinates
+    grid[0][0] = 'S';
+    grid[19][19] = 'G';
 }
