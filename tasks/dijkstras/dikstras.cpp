@@ -32,17 +32,30 @@ void dijstra(pair<int,int> start, pair<int,int>goal){
     return;
 }
 
+bool isValid(pair<int,int>position){
+    
+}
+
+struct Node{
+    int x,y;
+    double distance;
+    bool operator<(const Node& other) const{
+        return distance > other.distance;
+    }
+};
+
 int main(){
+
     for (int i = 0; i <20; i++){
         for (int j = 0 ; j < 20; j++){
             grid[i][j] = ' ';
         }
     }
 
-    // Add obstacles
+    // Add obstacles marked by #
     grid[5][5] = '#';
-    grid[5][6] = '#'
-    grid[5][7] = '#'
+    grid[5][6] = '#';
+    grid[5][7] = '#';
     grid[10][12] ='#';
     grid[9][12] ='#';
     grid[8][12] = '#';
