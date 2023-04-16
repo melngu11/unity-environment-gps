@@ -36,14 +36,32 @@ double dist(int x1, int y1, int x2, int y2) {
 
 // check if a node is valid (i.e., not an obstacle and within the grid)
 bool valid(int x, int y) {
-    return x >= 0 && x < N && y >= 0 && y < N && !(x == 5 && y >= 5 && y <= 7) && !(x == 10 && y == 12) && !(x == 9 && y == 12) && !(x == 8 && y == 12) && !(x == 7 && y == 12);
+    if (x < 0 || x >= N || y < 0 || y >= N) {
+        return false; // out of bounds
+    }
+    if (x == 5 && y >= 5 && y <= 7) {
+        return false; // obstacle
+    }
+    if (x == 10 && y == 12) {
+        return false; // obstacle
+    }
+    if (x == 9 && y == 12) {
+        return false; // obstacle
+    }
+    if (x == 8 && y == 12) {
+        return false; // obstacle
+    }
+    if (x == 7 && y == 12) {
+        return false; // obstacle
+    }
+    return true; // valid node
 }
 
 // implement Dijkstra's algorithm
 void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vector<vector<pair<int, int>>>& prevs) {
-    // initialize distances and previous nodes arrays
-    dists.assign(N, vector<double>(N, INF));
-    prevs.assign(N, vector<pair<int, int>>(N, { -1, -1 }));
+   
+    dists.assign(N, vector<double>(N, INF));     // Initialize the distances array to INF for all nodes for unvisited, cost to node is unknown
+    prevs.assign(N, vector<pair<int, int>>(N, { -1, -1 }));         // Initialize the previous nodes array to - 1, -1 for all nodes. This value indicates that no previous node exists for the particular node
     dists[sx][sy] = 0; // distance to start node is 0
     // priority queue to store nodes in increasing order of distance
     priority_queue<Node> pq;
@@ -85,8 +103,15 @@ int main() {
     vector<vector<char>> grid(N, vector<char>(N, '.'));
     grid[0][0] = 'S'; // start node
     grid[N-1][N-1] = 'G'; // goal node (19,19)
-    grid[5][5] = grid[5][6] = grid[5][7] = '#'; // obstacles denoted by '#'
-    grid[10][12] = grid[9][12] = grid[8][12] = grid[7][12] = '#';
+
+    // Add obstacles marked by #
+    grid[5][5] = '#';
+    grid[5][6] = '#';
+    grid[5][7] = '#';
+    grid[10][12] = '#';
+    grid[9][12] = '#';
+    grid[8][12] = '#';
+    grid[7][12] = '#';
 
     //print the grid after set up
     for (int i = 0; i < N; i++) {
@@ -102,7 +127,7 @@ int main() {
     vector<vector<pair<int, int>>> prevs;
     dijkstra(0, 0, N - 1, N - 1, dists, prevs);
 
-    // backtrack from the goal node to the start node to mark the shortest path
+    // backtrack from the goal node to the start node to mark the shortest path with '*' 
     int x = N - 1, y = N - 1;
     while (x != 0 || y != 0) {
         grid[x][y] = '*';
