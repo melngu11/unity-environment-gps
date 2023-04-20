@@ -37,7 +37,7 @@ double compute_distance(int x1, int y1, int x2, int y2) {
 }
 
 // check if a node is valid (i.e., not an obstacle and within the grid)
-bool is_valid(int x, int y, vector<pair<int,int> obs) {
+bool is_valid(int x, int y, vector<pair<int,int>> obs) {
     if (x < 0 || x >= N || y < 0 || y >= N) {
         return false; // out of bounds
     }
