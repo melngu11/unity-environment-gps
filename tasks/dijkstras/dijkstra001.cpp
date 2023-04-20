@@ -6,7 +6,7 @@
 #include <cmath>
 #include <vector>
 #include <queue>
-
+#include <set>
 using namespace std;
 
 const int N = 20; // size of the grid
@@ -37,7 +37,7 @@ double compute_distance(int x1, int y1, int x2, int y2) {
 }
 
 // check if a node is valid (i.e., not an obstacle and within the grid)
-bool is_valid(int x, int y, vector<vector<char>>grid) {
+bool is_valid(int x, int y, vector<vector<char>> &grid) {
     if (x < 0 || x >= N || y < 0 || y >= N) {
         return false; // out of bounds
     }
@@ -48,38 +48,51 @@ bool is_valid(int x, int y, vector<vector<char>>grid) {
 }
 
 // implement Dijkstra's algorithm
-void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vector<vector<pair<int, int>>>& prevs, vector<vector<char>> grid) {
+void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vector<vector<pair<int, int>>>& prevs, vector<vector<char>> &grid) {
    
     dists.assign(N, vector<double>(N, INF));     // Initialize the distances array to INF for all nodes for unvisited, cost to node is unknown
     prevs.assign(N, vector<pair<int, int>>(N, { -1, -1 }));         // Initialize the previous nodes array to - 1, -1 for all nodes. This value indicates that no previous node exists for the particular node
     dists[sx][sy] = 0; // distance to start node is 0
     // priority queue to store nodes in increasing order of distance
     priority_queue<Node> pq;
+    set<std::pair<int, int>> closed_set;    
+
     pq.push(Node(sx, sy, 0));
     while (!pq.empty()) {
         Node curr = pq.top(); //smallest cost is at top
         pq.pop();
         int x = curr.x;
         int y = curr.y;
+        std::cout << "Current node: " << x << " " << y << std::endl;
         double cost = curr.cost;
         //Check if the current node has already been visited with a shorter distance and skip it if so.
         if (dists[x][y] < cost) {
             continue; // this node has already been visited with a shorter distance, skip
         }
+
         // visit neighbors
         for (int dx = -1; dx <= 1; dx++) { //checks for constraint of grid, coordinates must be postiive
             for (int dy = -1; dy <= 1; dy++) {
+                
                 if (dx == 0 && dy == 0) {
                     continue; // don't consider the current node
                 }
+                
                 int nx = x + dx;
                 int ny = y + dy;
+                
+                if (closed_set.find(std::make_pair(nx, ny)) != closed_set.end()){
+                    std::cout << "Found" << std::endl;
+                    continue;
+                }
+
                 if (is_valid(nx, ny, grid)) {
                     double new_cost = cost + compute_distance(x, y, nx, ny);
                     if (new_cost < dists[nx][ny]) {
                         dists[nx][ny] = new_cost; // update distance to neighbor
                         prevs[nx][ny] = { x, y }; // update previous node to backtrack the shortest path
                         pq.push(Node(nx, ny, new_cost)); // add neighbor to priority queue
+                        closed_set.insert(std::make_pair(nx, ny));
                     }
                 }
             }
