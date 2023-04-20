@@ -43,7 +43,7 @@ bool is_valid(int x, int y, vector<pair<int,int>> obs) {
     }
     int number_of_obs = obs.size();
     for (auto it = obs.begin(); it != obs.end(); it++){
-        if (x == it.first && y == it.second)
+        if (x == it->first && y == it->second)
             return false; //node is an obstacle
     }
     return true; // valid node
@@ -99,13 +99,13 @@ int main() {
    
    // create obstacle list
     vector<pair<int, int>> obstacles;
-    obstacles.push_back(5,5);
-    obstacles.push_back(5,6);
-    obstacles.push_back(5,7);
-    obstacles.push_back(10,12);
-    obstacles.push_back(9,12);
-    obstacles.push_back(8,12);
-    obstacles.push_back(7,12);
+    obstacles.push_back(pair(5,5));
+    obstacles.push_back(pair(5,6));
+    obstacles.push_back(pair(5,7));
+    obstacles.push_back(pair(10,12));
+    obstacles.push_back(pair(9,12));
+    obstacles.push_back(pair(8,12));
+    obstacles.push_back(pair(7,12));
 
     //print the grid after set up
     for (int i = 0; i < N; i++) {
