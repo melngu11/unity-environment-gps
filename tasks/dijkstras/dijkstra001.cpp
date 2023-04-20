@@ -1,6 +1,6 @@
 // Dijkstra.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-//Current working cpp
+//Current working cpp  
 
 #include <iostream>
 #include <cmath>
@@ -37,20 +37,18 @@ double compute_distance(int x1, int y1, int x2, int y2) {
 }
 
 // check if a node is valid (i.e., not an obstacle and within the grid)
-bool is_valid(int x, int y, vector<pair<int,int>> obs) {
+bool is_valid(int x, int y, vector<vector<char>>grid) {
     if (x < 0 || x >= N || y < 0 || y >= N) {
         return false; // out of bounds
     }
-    int number_of_obs = obs.size();
-    for (auto it = obs.begin(); it != obs.end(); it++){
-        if (x == it->first && y == it->second)
-            return false; //node is an obstacle
+    if (grid[x][y] == '#'){
+      return false;
     }
     return true; // valid node
 }
 
 // implement Dijkstra's algorithm
-void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vector<vector<pair<int, int>>>& prevs, vector<pair<int,int>>& obstacles) {
+void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vector<vector<pair<int, int>>>& prevs, vector<vector<char>> grid) {
    
     dists.assign(N, vector<double>(N, INF));     // Initialize the distances array to INF for all nodes for unvisited, cost to node is unknown
     prevs.assign(N, vector<pair<int, int>>(N, { -1, -1 }));         // Initialize the previous nodes array to - 1, -1 for all nodes. This value indicates that no previous node exists for the particular node
@@ -76,8 +74,8 @@ void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vec
                 }
                 int nx = x + dx;
                 int ny = y + dy;
-                if (is_valid(nx, ny, obstacles)) {
-                    double new_cost = cost + dist(x, y, nx, ny);
+                if (is_valid(nx, ny, grid)) {
+                    double new_cost = cost + compute_distance(x, y, nx, ny);
                     if (new_cost < dists[nx][ny]) {
                         dists[nx][ny] = new_cost; // update distance to neighbor
                         prevs[nx][ny] = { x, y }; // update previous node to backtrack the shortest path
@@ -99,13 +97,17 @@ int main() {
    
    // create obstacle list
     vector<pair<int, int>> obstacles;
-    obstacles.push_back(pair(5,5));
-    obstacles.push_back(pair(5,6));
-    obstacles.push_back(pair(5,7));
-    obstacles.push_back(pair(10,12));
-    obstacles.push_back(pair(9,12));
-    obstacles.push_back(pair(8,12));
-    obstacles.push_back(pair(7,12));
+    obstacles.push_back(make_pair(5,5));
+    obstacles.push_back(make_pair(5,6));
+    obstacles.push_back(make_pair(5,7));
+    obstacles.push_back(make_pair(10,12));
+    obstacles.push_back(make_pair(9,12));
+    obstacles.push_back(make_pair(8,12));
+    obstacles.push_back(make_pair(7,12));
+
+    for (int i = 0; i < obstacles.size(); i++){
+      grid[obstacles[i].first][obstacles[i].second] = '#';
+    }
 
     //print the grid after set up
     for (int i = 0; i < N; i++) {
@@ -119,7 +121,7 @@ int main() {
     // run Dijkstra's algorithm to find the shortest path
     vector<vector<double>> dists;
     vector<vector<pair<int, int>>> prevs;
-    dijkstra(0, 0, N - 1, N - 1, dists, prevs, obstacles);
+    dijkstra(0, 0, N - 1, N - 1, dists, prevs, grid);
 
     // backtrack from the goal node to the start node to mark the shortest path with '*' 
     int x = N - 1, y = N - 1;
@@ -144,3 +146,4 @@ int main() {
 
     return 0;
 }
+
