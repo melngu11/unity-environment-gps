@@ -6,8 +6,13 @@
 #include <cmath>
 #include <vector>
 #include <queue>
+#include <set>
+#include <ctime>
+#include <chrono>
+
 
 using namespace std;
+using namespace std::chrono;
 
 const int N = 20; // size of the grid
 const double INF = 1e9; // a large value to represent infinity
@@ -28,33 +33,35 @@ double compute_distance(int x1, int y1, int x2, int y2) {
     if (x1 == x2) {
         return y2 - y1;
     }
-    else if (y1 == y2){
-        return x2 - x1; 
+    else if (y1 == y2) {
+        return x2 - x1;
     }
     else {
-        return sqrt(pow(x2-x1, 2) + pow(y2-y1, 2));
+        return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
     }
 }
 
 // check if a node is valid (i.e., not an obstacle and within the grid)
-bool is_valid(int x, int y, vector<vector<char>>grid) {
+bool is_valid(int x, int y, vector<vector<char>>& grid) {
     if (x < 0 || x >= N || y < 0 || y >= N) {
         return false; // out of bounds
     }
-    if (grid[x][y] == '#'){
-      return false;
+    if (grid[x][y] == '#') {
+        return false;
     }
     return true; // valid node
 }
 
 // implement Dijkstra's algorithm
-void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vector<vector<pair<int, int>>>& prevs, vector<vector<char>> grid) {
-   
+void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vector<vector<pair<int, int>>>& prevs, vector<vector<char>>& grid) {
+
     dists.assign(N, vector<double>(N, INF));     // Initialize the distances array to INF for all nodes for unvisited, cost to node is unknown
     prevs.assign(N, vector<pair<int, int>>(N, { -1, -1 }));         // Initialize the previous nodes array to - 1, -1 for all nodes. This value indicates that no previous node exists for the particular node
     dists[sx][sy] = 0; // distance to start node is 0
     // priority queue to store nodes in increasing order of distance
-    priority_queue<Node> pq;
+    priority_queue<Node> pq; // open node set
+    set<pair<int, int>> closed_set; // closed set of closed node (use pair instead of Node to conserve space)
+
     pq.push(Node(sx, sy, 0));
     while (!pq.empty()) {
         Node curr = pq.top(); //smallest cost is at top
@@ -74,12 +81,18 @@ void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vec
                 }
                 int nx = x + dx;
                 int ny = y + dy;
+
+                // check if next node has been visisted and closed, continue if found
+                if (closed_set.find(make_pair(nx, ny)) != closed_set.end()) {
+                    continue;
+                }
                 if (is_valid(nx, ny, grid)) {
                     double new_cost = cost + compute_distance(x, y, nx, ny);
                     if (new_cost < dists[nx][ny]) {
                         dists[nx][ny] = new_cost; // update distance to neighbor
                         prevs[nx][ny] = { x, y }; // update previous node to backtrack the shortest path
                         pq.push(Node(nx, ny, new_cost)); // add neighbor to priority queue
+                        closed_set.insert(make_pair(nx, ny)); // add  neighbor to closed set as visted 
                     }
                 }
             }
@@ -88,25 +101,57 @@ void dijkstra(int sx, int sy, int gx, int gy, vector<vector<double>>& dists, vec
 }
 
 int main() {
+    // initalize start of clock
+    auto start = high_resolution_clock::now();
+
     // initialize the grid with obstacles, start, and goal nodes
     // '.' denotes nodes within the coordinate
     vector<vector<char>> grid(N, vector<char>(N, '.'));
     grid[0][0] = 'S'; // start node
-    grid[N-1][N-1] = 'G'; // goal node (19,19)
-    
-   
-   // create obstacle list
-    vector<pair<int, int>> obstacles;
-    obstacles.push_back(make_pair(5,5));
-    obstacles.push_back(make_pair(5,6));
-    obstacles.push_back(make_pair(5,7));
-    obstacles.push_back(make_pair(10,12));
-    obstacles.push_back(make_pair(9,12));
-    obstacles.push_back(make_pair(8,12));
-    obstacles.push_back(make_pair(7,12));
+    grid[N - 1][N - 1] = 'G'; // goal node (19,19)
 
-    for (int i = 0; i < obstacles.size(); i++){
-      grid[obstacles[i].first][obstacles[i].second] = '#';
+
+    // create obstacle list
+    vector<pair<int, int>> obstacles;
+    obstacles.push_back(make_pair(5, 5));
+    obstacles.push_back(make_pair(5, 6));
+    obstacles.push_back(make_pair(5, 7));
+    obstacles.push_back(make_pair(10, 12));
+    obstacles.push_back(make_pair(9, 12));
+    obstacles.push_back(make_pair(8, 12));
+    obstacles.push_back(make_pair(7, 12));
+
+
+    // uncomment obstacles below too add more. This will show a better contrast between dijkstra and A* time to compute
+
+     /*obstacles.push_back(make_pair(7, 10));
+     obstacles.push_back(make_pair(8, 10));
+     obstacles.push_back(make_pair(9, 10));
+     obstacles.push_back(make_pair(10, 10));
+     obstacles.push_back(make_pair(11, 10));
+     obstacles.push_back(make_pair(12, 10));
+     obstacles.push_back(make_pair(13, 10));
+     obstacles.push_back(make_pair(14, 10));
+     obstacles.push_back(make_pair(19, 10));
+
+     obstacles.push_back(make_pair(5, 2));
+     obstacles.push_back(make_pair(5, 1));
+     obstacles.push_back(make_pair(5, 8));
+
+     obstacles.push_back(make_pair(5, 3));
+     obstacles.push_back(make_pair(4, 3));
+     obstacles.push_back(make_pair(3, 3));
+
+     obstacles.push_back(make_pair(18, 18));
+     obstacles.push_back(make_pair(17, 18));
+     obstacles.push_back(make_pair(16, 18));
+     obstacles.push_back(make_pair(14, 15));
+     obstacles.push_back(make_pair(15, 15));
+     obstacles.push_back(make_pair(16, 15));*/
+
+
+    for (int i = 0; i < obstacles.size(); i++) {
+        grid[obstacles[i].first][obstacles[i].second] = '#';
     }
 
     //print the grid after set up
@@ -143,6 +188,13 @@ int main() {
         }
         cout << endl;
     }
+    // stop the clock and compute duration of program 
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+
+    cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
+    
+
 
     return 0;
 }
